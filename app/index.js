@@ -1,62 +1,122 @@
 'use strict';
-var yeoman = require('yeoman-generator');
+
+var generators = require('yeoman-generator');
 var chalk = require('chalk');
 var yosay = require('yosay');
+var request = require('request');
+var path = require('path');
+var fs = require('fs');
+var rimraf = require('rimraf');
+var admzip = require('adm-zip');
 
-module.exports = yeoman.generators.Base.extend({
-  initializing: function () {
-    this.pkg = require('../package.json');
-  },
+module.exports = generators.Base.extend({
 
-  prompting: function () {
-    var done = this.async();
+	constructor: function () {
+		// Calling the super constructor
+		generators.Base.apply(this, arguments);
 
-    // Have Yeoman greet the user.
-    this.log(yosay(
-      'Welcome to the awe-inspiring' + chalk.red('Sentinel') + ' generator!'
-    ));
+		this.argument('appname', {type: String, required: false});
+		this.appname = this.appname || path.basename(process.cwd());
+		this.appname = this._.camelize(this._.slugify(this._.humanize(this.appname)));
 
-    var prompts = [{
-      type: 'confirm',
-      name: 'someOption',
-      message: 'Would you like to enable this option?',
-      default: true
-    }];
+		this.option('version', {type: String, defaults: 'develop'});
+	},
 
-    this.prompt(prompts, function (props) {
-      this.someOption = props.someOption;
+	initializing: function () {
+		this.pkg = require('../package.json');
+		this.cfg = require('../config.json');
 
-      done();
-    }.bind(this));
-  },
+		this.srcZip = 'http://github.com/' + this.cfg.repository + '/archive/' + this.options.version + '.zip';
+		this.destZip = this.templatePath('sentinel.zip');
+		this.destTemplates = this.templatePath('sentinel');
+	},
 
-  writing: {
-    app: function () {
-      this.fs.copy(
-        this.templatePath('_package.json'),
-        this.destinationPath('package.json')
-      );
-      this.fs.copy(
-        this.templatePath('_bower.json'),
-        this.destinationPath('bower.json')
-      );
-    },
+	prompting: function () {
+		var done = this.async();
 
-    projectfiles: function () {
-      this.fs.copy(
-        this.templatePath('editorconfig'),
-        this.destinationPath('.editorconfig')
-      );
-      this.fs.copy(
-        this.templatePath('jshintrc'),
-        this.destinationPath('.jshintrc')
-      );
-    }
-  },
+		// Have Yeoman greet the user.
+		this.log(yosay(
+			'Welcome to the awe-inspiring ' + chalk.cyan('Sentinel') + ' generator!'
+		));
 
-  install: function () {
-    this.installDependencies({
-      skipInstall: this.options['skip-install']
-    });
-  }
+		this.prompt([
+			{
+				name: 'version',
+				message: 'What\'s the version of sentinel you want to use?',
+				default: this.options.version
+			}
+		], function (props) {
+			this.options.version = props.version;
+
+			done();
+		}.bind(this));
+	},
+
+	writing: {
+		/* clean: function () {
+			var done = this.async();
+
+			this.log('Cleaning templates');
+
+			rimraf(this.destTemplates, function () {
+				done();
+			});
+		},
+		download: function () {
+			var self = this;
+			var done = this.async();
+
+			this.log('Download ' + chalk.cyan(this.srcZip));
+
+			var dl = request
+				.get(this.srcZip)
+				.on('error', function (err) {
+					self.log(chalk.red(err));
+				})
+				.pipe(fs.createWriteStream(this.destZip));
+
+			dl.on('finish', function () {
+				done();
+			});
+		},
+		extract: function () {
+			var done = this.async();
+
+			this.log('Extracting templates');
+			var zip = new admzip(this.destZip);
+			var zipEntries = zip.getEntries();
+
+			zipEntries.forEach(function (entry) {
+				try {
+					zip.extractEntryTo(entry, this.destTemplates + entry.entryName.substring(entry.entryName.indexOf('/')), false, false);
+				}
+				catch (e) {
+				}
+			}, this);
+
+			done();
+		}, */
+		app: function () {
+			this.log('copying templates');
+
+			var files = this.expandFiles('**/*', {cwd: this.sourceRoot(), dot: true});
+			var ignores = [
+				// files to ignore
+			];
+
+			files.forEach(function (file) {
+				if (ignores.indexOf(file) !== -1) {
+					return;
+				}
+
+				this.fs.copy(this.templatePath(file), this.destinationPath(file));
+			}, this);
+		}
+	},
+
+	install: function () {
+		this.installDependencies({
+			skipInstall: this.options['skip-install']
+		});
+	}
 });
