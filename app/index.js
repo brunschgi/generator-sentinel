@@ -8,6 +8,7 @@ var path = require('path');
 var fs = require('fs');
 var rimraf = require('rimraf');
 var admzip = require('adm-zip');
+var lodash = require('lodash');
 
 module.exports = generators.Base.extend({
 
@@ -15,11 +16,9 @@ module.exports = generators.Base.extend({
 		// Calling the super constructor
 		generators.Base.apply(this, arguments);
 
-		this.argument('appname', {type: String, required: false});
-		this.appname = this.appname || path.basename(process.cwd());
-		this.appname = this._.camelize(this._.slugify(this._.humanize(this.appname)));
-
-		this.option('version', {type: String, defaults: 'develop'});
+		this.argument('name', {type: String, required: false});
+		this.name = this.name || path.basename(process.cwd());
+		this.name = lodash.kebabCase(this.name);
 	},
 
 	initializing: function () {
@@ -34,19 +33,18 @@ module.exports = generators.Base.extend({
 	prompting: function () {
 		var done = this.async();
 
-		// Have Yeoman greet the user.
 		this.log(yosay(
 			'Welcome to the awe-inspiring ' + chalk.cyan('Sentinel') + ' generator!'
 		));
 
 		this.prompt([
 			{
-				name: 'version',
-				message: 'What\'s the version of sentinel you want to use?',
-				default: this.options.version
+				name: 'appname',
+				message: 'What\'s the name of your application?',
+				default: this.name
 			}
 		], function (props) {
-			this.options.version = props.version;
+			this.name = props.name;
 
 			done();
 		}.bind(this));
@@ -97,11 +95,12 @@ module.exports = generators.Base.extend({
 			done();
 		}, */
 		app: function () {
-			this.log('copying templates');
+			this.log('Scaffolding your app');
 
 			var files = this.expandFiles('**/*', {cwd: this.sourceRoot(), dot: true});
 			var ignores = [
 				// files to ignore
+				'.DS_Store'
 			];
 
 			files.forEach(function (file) {
@@ -118,5 +117,9 @@ module.exports = generators.Base.extend({
 		this.installDependencies({
 			skipInstall: this.options['skip-install']
 		});
+	},
+
+	end: function() {
+		this.log(chalk.green('All done – have fun'));
 	}
 });

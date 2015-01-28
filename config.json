@@ -1,21 +1,3 @@
 {
-  "repository" : "namics/sentinel",
-  "components": {
-    "element": {
-      "template": "project/blueprint/element",
-      "path": "patterns/elements",
-      "component_prefix": "e"
-    },
-    "group": {
-      "template": "project/blueprint/group",
-      "path": "patterns/groups",
-      "component_prefix": "g"
-    },
-    "module": {
-      "template": "project/blueprint/module",
-      "path": "patterns/modules",
-      "component_prefix": "mod",
-      "skin_prefix": "skin"
-    }
-  }
+  "repository" : "namics/sentinel"
 }
