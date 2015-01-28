@@ -7,16 +7,16 @@ var path = require('path'),
         strict: false
     });
 
-router.use('/', express.static(cfg.micro.base_path + '/public/'));
-router.use('/', express.static(cfg.micro.base_path + '/assets/'));
+router.use('/', express.static(cfg.sentinel.base_path + '/public/'));
+router.use('/', express.static(cfg.sentinel.base_path + '/assets/'));
 
 /**
  * TODO: List views if no index
  */
 router.get('/', function(req, res) {
     var tplPath = path.join(
-        cfg.micro.view_directory,
-        'index.' + cfg.micro.view_file_extension
+        cfg.sentinel.view_directory,
+        'index.' + cfg.sentinel.view_file_extension
     );
 
     fs.exists(tplPath, function(exists) {
@@ -35,9 +35,9 @@ router.get('/', function(req, res) {
 router.get('/:view', function(req, res) {
     var tplName = req.params.view.toLowerCase().replace(/-/g, '/'),
         tplPath = path.join(
-            cfg.micro.view_directory,
+            cfg.sentinel.view_directory,
             '/',
-            tplName + '.' + cfg.micro.view_file_extension
+            tplName + '.' + cfg.sentinel.view_file_extension
         );
 
     fs.exists(tplPath, function(exists) {

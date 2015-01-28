@@ -5,9 +5,9 @@ var express = require('express'),
     hbs = require('./app/core/hbs');
 
 app.use(router);
-app.set('view engine', cfg.micro.view_file_extension);
-app.set('views', cfg.micro.view_directory);
-app.engine(cfg.micro.view_file_extension, hbs.__express);
+app.set('view engine', cfg.sentinel.view_file_extension);
+app.set('views', cfg.sentinel.view_directory);
+app.engine(cfg.sentinel.view_file_extension, hbs.__express);
 
 
 var server = app.listen(8080, function() {

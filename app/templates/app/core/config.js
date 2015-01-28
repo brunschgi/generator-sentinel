@@ -7,7 +7,7 @@ var defaultConfig = {
     base_path: path.normalize(__dirname + '../../../'),
     view_directory: path.normalize(__dirname + '../../../') + 'views',
     view_file_extension: 'html',
-    view_partials_directory: 'views/partials'
+    view_partials_directory: 'views/_partials'
 };
 
 config.sentinel = config.sentinel || defaultConfig;

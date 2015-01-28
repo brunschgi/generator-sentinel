@@ -4,7 +4,7 @@ var fs = require('fs'),
     cfg = require('./config'),
     helpersDir = path.normalize(__dirname + '../../helpers/');
 
-hbs.registerPartials(cfg.micro.base_path + cfg.micro.view_partials_directory);
+hbs.registerPartials(cfg.sentinel.base_path + cfg.sentinel.view_partials_directory);
 
 var files = fs.readdirSync(helpersDir);
 files.forEach(function(file) {
